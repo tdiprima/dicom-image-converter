@@ -14,7 +14,7 @@ public class ImageConverter {
 
     // Decode JPEG 2000 to a BufferedImage
     public static BufferedImage decodeJPEG2000(File jpeg2000File) throws IOException {
-        BufferedImage image = ImageIO.read(jpeg2000File); // Requires JPEG 2000 ImageIO plugin
+        BufferedImage image = ImageIO.read(jpeg2000File);
         if (image == null) {
             throw new IOException("Failed to decode JPEG 2000 image: " + jpeg2000File.getName());
         }
