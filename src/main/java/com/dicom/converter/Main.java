@@ -1,5 +1,6 @@
 package com.dicom.converter;
 
+import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.UID;
 import java.io.File;
 import java.io.IOException;
@@ -45,10 +46,11 @@ public class Main {
         if (UID.JPEG2000.equals(encoding)) {
             File jpegFile = new File(outputDir, dicomFile.getName().replace(".dcm", ".jpg"));
             ImageConverter.convertToJPEG(dicomFile, jpegFile);
-            DicomMetadataUpdater.updateDicomMetadata(dicomFile, jpegFile, UID.JPEGBaseline1);
+            DicomMetadataUpdater.updateDicomMetadata(dicomFile, jpegFile, UID.JPEGBaseline8Bit);
             System.out.println("Converted JPEG 2000 to JPEG: " + jpegFile.getName());
         } else {
             System.out.println("No conversion needed for: " + dicomFile.getName());
         }
+
     }
 }
