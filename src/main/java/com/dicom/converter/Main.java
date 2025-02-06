@@ -1,5 +1,6 @@
 package com.dicom.converter;
 
+import java.awt.image.BufferedImage;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.UID;
 import java.io.File;
@@ -44,13 +45,21 @@ public class Main {
         String encoding = DicomProcessor.detectEncoding(attributes);
 
         if (UID.JPEG2000.equals(encoding)) {
-            File jpegFile = new File(outputDir, dicomFile.getName().replace(".dcm", ".jpg"));
-            ImageConverter.convertToJPEG(dicomFile, jpegFile);
-            DicomMetadataUpdater.updateDicomMetadata(dicomFile, jpegFile, UID.JPEGBaseline8Bit);
-            System.out.println("Converted JPEG 2000 to JPEG: " + jpegFile.getName());
+            System.out.println("Detected JPEG 2000 encoding in: " + dicomFile.getName());
+
+            // Decode JPEG 2000 and convert to standard JPEG
+            File tempJpegFile = new File("temp_image.jpg"); // Temporary file for standard JPEG
+            BufferedImage rawImage = ImageConverter.decodeJPEG2000(dicomFile); // Decode JPEG 2000
+            ImageConverter.encodeAsJPEG(rawImage, tempJpegFile); // Encode as JPEG
+
+            // Save updated DICOM file in outputDir
+            File updatedDicomFile = new File(outputDir, dicomFile.getName());
+            DicomMetadataUpdater.updateDicomWithJPEG(dicomFile, tempJpegFile, updatedDicomFile);
+
+            System.out.println("Converted and saved updated DICOM: " + updatedDicomFile.getAbsolutePath());
         } else {
             System.out.println("No conversion needed for: " + dicomFile.getName());
         }
-
     }
+
 }

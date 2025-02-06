@@ -12,11 +12,17 @@ import java.io.IOException;
  */
 public class ImageConverter {
 
-    public static void convertToJPEG(File inputFile, File outputFile) throws IOException {
-        BufferedImage image = ImageIO.read(inputFile);
+    // Decode JPEG 2000 to a BufferedImage
+    public static BufferedImage decodeJPEG2000(File jpeg2000File) throws IOException {
+        BufferedImage image = ImageIO.read(jpeg2000File); // Requires JPEG 2000 ImageIO plugin
         if (image == null) {
-            throw new IOException("Failed to decode JPEG 2000 image: " + inputFile.getName());
+            throw new IOException("Failed to decode JPEG 2000 image: " + jpeg2000File.getName());
         }
+        return image;
+    }
+
+    // Encode a BufferedImage as standard JPEG
+    public static void encodeAsJPEG(BufferedImage image, File outputFile) throws IOException {
         ImageIO.write(image, "JPEG", outputFile);
     }
 }
