@@ -5,7 +5,6 @@ import org.dcm4che3.data.Tag;
 import org.dcm4che3.io.DicomInputStream;
 import java.io.File;
 import java.io.IOException;
-import org.dcm4che3.data.UID;
 
 /**
  * Reads DICOM Files and Extracts Encoding
@@ -16,19 +15,38 @@ public class DicomProcessor {
 
     public static Attributes readDicomFile(File dicomFile) throws IOException {
         try (DicomInputStream dis = new DicomInputStream(dicomFile)) {
-            return dis.readDataset(-1, -1);
+            // Read file meta
+            Attributes fileMeta = dis.readFileMetaInformation();
+
+            // Read the main dataset
+            Attributes dataset = dis.readDataset(-1, -1);
+
+            // Merge file meta into the dataset (so TransferSyntaxUID is available directly)
+            dataset.addAll(fileMeta);
+
+            return dataset;
         }
     }
 
     public static String detectEncoding(Attributes dicomAttributes) {
-        String transferSyntaxUID = dicomAttributes.getString(Tag.TransferSyntaxUID);
-        System.out.println("Detected Transfer Syntax UID: " + transferSyntaxUID);
-
-        if (UID.JPEG2000.equals(transferSyntaxUID) || UID.JPEG2000Lossless.equals(transferSyntaxUID)) {
-            return UID.JPEG2000; // Treat both as JPEG2000
-        } else {
-            return transferSyntaxUID;
+        if (dicomAttributes == null) {
+            System.out.println("DICOM Attributes are null!");
+            return null;
         }
+
+        // First, check TransferSyntaxUID in the file meta information
+        String transferSyntaxUID = dicomAttributes.getString(Tag.TransferSyntaxUID);
+
+        if (transferSyntaxUID == null) {
+            System.out.println("Transfer Syntax UID not found in dataset. Checking file meta info...");
+            Attributes fileMetaInfo = dicomAttributes.getNestedDataset(Tag.FileMetaInformationGroupLength);
+            if (fileMetaInfo != null) {
+                transferSyntaxUID = fileMetaInfo.getString(Tag.TransferSyntaxUID);
+            }
+        }
+
+        System.out.println("Detected Transfer Syntax UID: " + transferSyntaxUID);
+        return transferSyntaxUID;
     }
 
 }

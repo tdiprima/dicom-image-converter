@@ -27,9 +27,7 @@ file_meta.MediaStorageSOPClassUID = pydicom.uid.SecondaryCaptureImageStorage
 file_meta.MediaStorageSOPInstanceUID = pydicom.uid.generate_uid()
 
 # Transfer Syntax UIDs
-file_meta.TransferSyntaxUID = JPEG2000Lossless            # 1.2.840.10008.1.2.4.91
-# file_meta.TransferSyntaxUID = pydicom.uid.JPEG2000      # 1.2.840.10008.1.2.4.90
-# file_meta.TransferSyntaxUID = "1.2.840.10008.1.2.4.91"  # JPEG 2000 Image Compression
+file_meta.TransferSyntaxUID = pydicom.uid.JPEG2000  # 1.2.840.10008.1.2.4.91
 
 file_meta.ImplementationClassUID = "1.2.3.4.5.6.7.8.9"  # Dummy UID
 
@@ -47,13 +45,14 @@ ds.SOPClassUID = file_meta.MediaStorageSOPClassUID
 
 # Step 5: Set Image Pixel Data Attributes
 ds.PixelData = encapsulated_data  # Use encapsulated data
-ds.Rows = 256  # Replace with actual image height
-ds.Columns = 256  # Replace with actual image width
+ds.Rows = 256
+ds.Columns = 256
 ds.BitsAllocated = 8
 ds.BitsStored = 8
 ds.HighBit = 7
 ds.SamplesPerPixel = 1
 ds.PhotometricInterpretation = "MONOCHROME2"
+ds.PixelRepresentation = 0  # unsigned
 
 # Step 6: Save the DICOM file
 ds.is_little_endian = True
